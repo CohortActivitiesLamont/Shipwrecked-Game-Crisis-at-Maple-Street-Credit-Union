@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Crisis at Maple Street Credit Union</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #0f172a;
+      color: #f1f5f9;
+      min-height: 100vh;
+    }
+
+    .screen {
+      display: none;
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 24px 16px;
+    }
+
+    .screen.active {
+      display: block;
+    }
+
+    h1 {
+      font-size: 26px;
+      font-weight: 800;
+      line-height: 1.2;
+    }
+
+    h2 {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    p {
+      line-height: 1.7;
+      color: #94a3b8;
+    }
+
+    .badge {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #38bdf8;
+      margin-bottom: 10px;
+    }
+
+    .card {
+      background: #1e293b;
+      border-radius: 14px;
+      padding: 20px;
+      margin-bottom: 16px;
+      border: 1px solid #334155;
+    }
+
+    input,
+    select {
+      width: 100%;
+      padding: 10px 14px;
+      border-radius: 8px;
+      border: 1.5px solid #334155;
+      background: #0f172a;
+      color: #f1f5f9;
+      font-size: 15px;
+      font-family: inherit;
+      outline: none;
+    }
+
+    input:focus,
+    select:focus {
+      border-color: #38bdf8;
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: #94a3b8;
+      margin-bottom: 6px;
+      margin-top: 14px;
+    }
+
+    .btn {
+      display: block;
+      width: 100%;
+      padding: 14px;
+      border-radius: 10px;
+      border: none;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: opacity 0.2s;
+      margin-top: 20px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #6366f1, #38bdf8);
+      color: white;
+    }
+
+    .btn-danger {
+      background: #ef4444;
+      color: white;
+    }
+
+    .btn-ghost {
+      background: #1e293b;
+      color: #94a3b8;
+      border: 1px solid #334155;
+    }
+
+    .btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .btn-sm {
+      display: inline-block;
+      width: auto;
+      padding: 8px 16px;
+      font-size: 13px;
+      margin-top: 0;
+    }
+
+    /* Tool cards */
+    .tools-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .tool-card {
+      background: #0f172a;
+      border: 1.5px solid #334155;
+      border-radius: 12px;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      cursor: grab;
+      transition: border-color 0.2s, background 0.2s;
+      user-select: none;
+    }
+
+    .tool-card:active {
+      cursor: grabbing;
+    }
+
+    .tool-card.selected {
+      border-color: #6366f1;
+      background: #1e1b4b;
+    }
+
+    .tool-card.dragging {
+      opacity: 0.4;
+    }
+
+    .tool-card.drag-over {
+      border-color: #38bdf8;
+      background: #0c2231;
+    }
+
+    .tool-emoji {
+      font-size: 28px;
+      flex-shrink: 0;
+    }
+
+    .tool-info {
+      flex: 1;
+    }
+
+    .tool-name {
+      font-weight: 700;
+      font-size: 15px;
+      color: #f1f5f9;
+    }
+
+    .tool-desc {
+      font-size: 12px;
+      color: #64748b;
+      margin-top: 2px;
+    }
+
+    .tool-cost {
+      font-size: 12px;
+      color: #fbbf24;
+      font-weight: 600;
+      margin-top: 4px;
+    }
+
+    .tool-qty {
+      font-size: 11px;
+      color: #ef4444;
+      font-weight: 700;
+      margin-top: 2px;
+    }
+
+    .rank-badge {
+      background: #6366f1;
+      color: white;
+      font-weight: 800;
+      font-size: 14px;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .budget-bar {
+      background: #1e293b;
+      border-radius: 12px;
+      padding: 14px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      margin-bottom: 16px;
+      border: 1px solid #334155;
+    }
+
+    .budget-num {
+      font-size: 22px;
+      font-weight: 800;
+      color: #38bdf8;
+    }
+
+    .budget-label {
+      font-size: 12px;
+      color: #64748b;
+    }
+
+    .timer {
+      font-size: 32px;
+      font-weight: 800;
+      color: #f97316;
+      text-align: center;
+      margin: 8px 0;
+    }
+
+    .timer.urgent {
+      color: #ef4444;
+      animation: pulse 1s infinite;
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        opacity: 1
+      }
+
+      50% {
+        opacity: 0.5
+      }
+    }
+
+    /* Facilitator */
+    .team-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 14px;
+      margin-top: 16px;
+    }
+
+    .team-submission {
+      background: #1e293b;
+      border-radius: 12px;
+      padding: 16px;
+      border: 1px solid #334155;
+    }
+
+    .team-name-label {
+      font-weight: 700;
+      color: #38bdf8;
+      font-size: 14px;
+      margin-bottom: 10px;
+    }
+
+    .ranked-tool {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 6px 0;
+      border-bottom: 1px solid #1e293b;
+      font-size: 13px;
+    }
+
+    .ranked-tool:last-child {
+      border-bottom: none;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #22c55e;
+      display: inline-block;
+      margin-right: 6px;
+      animation: pulse 2s infinite;
+    }
+
+    .info-box {
+      background: #1e293b;
+      border-left: 3px solid #38bdf8;
+      border-radius: 0 8px 8px 0;
+      padding: 12px 16px;
+      margin: 12px 0;
+      font-size: 14px;
+      color: #94a3b8;
+      line-height: 1.6;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .tab {
+      padding: 8px 18px;
+      border-radius: 8px;
+      border: 1.5px solid #334155;
+      background: transparent;
+      color: #94a3b8;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    .tab.active {
+      background: #6366f1;
+      border-color: #6366f1;
+      color: white;
+    }
+
+    .pill {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      margin-left: 8px;
+    }
+
+    .pill-green {
+      background: #14532d;
+      color: #4ade80;
+    }
+
+    .pill-yellow {
+      background: #713f12;
+      color: #fbbf24;
+    }
+
+    .pill-red {
+      background: #7f1d1d;
+      color: #f87171;
+    }
+
+    .error {
+      color: #f87171;
+      font-size: 13px;
+      margin-top: 8px;
+    }
+
+    .success-icon {
+      font-size: 64px;
+      text-align: center;
+      margin: 20px 0;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ───────── SCREEN: CONFIG (first load) ───────── -->
+  <div id="screen-config" class="screen active">
+    <div style="margin-top: 40px;">
+      <div class="badge">Workshop Game</div>
+      <h1>Crisis at Maple Street<br>Credit Union 🏦</h1>
+      <p style="margin: 12px 0 24px;">A team survival game about rebuilding financial infrastructure under pressure.</p>
+
+      <div class="card">
+        <h2>How are you joining?</h2>
+        <label>Your role</label>
+        <select id="role-select">
+          <option value="">— Select —</option>
+          <option value="participant">Participant</option>
+          <option value="facilitator">Facilitator</option>
+        </select>
+
+        <div id="participant-fields" style="display:none;">
+          <label>Your name</label>
+          <input id="p-name" type="text" placeholder="e.g. Sarah Johnson" />
+          <label>Your team name</label>
+          <input id="p-team" type="text" placeholder="e.g. Team Alpha" />
+        </div>
+
+        <div id="facilitator-fields" style="display:none;">
+          <label>Facilitator password</label>
+          <input id="fac-pass" type="password" placeholder="Enter password" />
+          <p id="fac-error" class="error" style="display:none;">Incorrect password.</p>
+        </div>
+
+        <button class="btn btn-primary" onclick="handleRoleSubmit()">Continue →</button>
+      </div>
+
+      <div class="info-box">
+        💡 Share this page link in your Zoom chat so all participants can join.
+      </div>
+    </div>
+  </div>
+
+  <!-- ───────── SCREEN: SCENARIO ───────── -->
+  <div id="screen-scenario" class="screen">
+    <div class="badge">The Crisis</div>
+    <h1>It's Monday Morning 🚨</h1>
+    <div class="card" style="margin-top: 16px;">
+      <p style="color:#f1f5f9; line-height:1.8;">
+        Maple Street Credit Union just learned their payment processor is <strong>shutting down in 48 hours.</strong>
+        Members are panicking. Payroll for local businesses won't go out. Remittances won't send.
+        The mobile app is frozen. Your leadership team has a <strong>limited budget of 10 points</strong>
+        and must rebuild member services — fast.
+      </p>
+      <p style="margin-top: 12px;">
+        Some tools are familiar. Some are new. Some are scarce — other teams want them too.
+        Choose wisely, rank your priorities, and be ready to defend your decisions.
+      </p>
+    </div>
+    <div class="card">
+      <div class="badge">Your Team</div>
+      <div id="team-display" style="font-size:18px; font-weight:700; color:#38bdf8; margin-top:4px;"></div>
+    </div>
+    <button class="btn btn-primary" onclick="goToGame()">Start Selecting Tools →</button>
+  </div>
+
+  <!-- ───────── SCREEN: GAME ───────── -->
+  <div id="screen-game" class="screen">
+    <div class="budget-bar">
+      <div>
+        <div class="budget-label">Budget Remaining</div>
+        <div class="budget-num" id="budget-display">10 pts</div>
+      </div>
+      <div style="text-align:right;">
+        <div class="budget-label">Time Left</div>
+        <div class="timer" id="timer-display">25:00</div>
+      </div>
+    </div>
+
+    <div class="badge">Step 1 — Select up to 5 tools</div>
+    <h2 style="margin-bottom:4px;">Available Tools</h2>
+    <p style="margin-bottom:16px; font-size:13px;">Tap a tool to select it. You have 10 budget points. Selected tools
+      appear in your ranked list below.</p>
+
+    <div class="tools-grid" id="tools-available"></div>
+
+    <div style="margin-top: 28px;">
+      <div class="badge">Step 2 — Rank your selections</div>
+      <h2 style="margin-bottom:4px;">Your Priority List</h2>
+      <p style="margin-bottom:16px; font-size:13px;">Drag to reorder. #1 = most critical to your credit union's
+        survival.</p>
+      <div class="tools-grid" id="tools-ranked"></div>
+      <p id="ranked-empty" style="font-size:13px; color:#475569; text-align:center; padding:20px 0;">
+        Select tools above to build your ranked list.
+      </p>
+    </div>
+
+    <div style="margin-top: 12px;">
+      <label style="color:#94a3b8; font-size:13px;">Team strategy / notes (optional)</label>
+      <input id="team-notes" type="text" placeholder="Why did you pick these tools?" style="margin-top:6px;" />
+    </div>
+
+    <button class="btn btn-primary" id="submit-btn" onclick="submitSelections()" disabled>Submit Team
+      Selections</button>
+    <p id="submit-error" class="error" style="display:none;"></p>
+  </div>
+
+  <!-- ───────── SCREEN: SUBMITTED ───────── -->
+  <div id="screen-submitted" class="screen">
+    <div class="success-icon">🎉</div>
+    <h1 style="text-align:center;">Submitted!</h1>
+    <p style="text-align:center; margin-top:12px;">Your team's selections have been recorded. Stay on the Zoom call —
+      we'll review everyone's choices together shortly.</p>
+    <div class="card" style="margin-top:24px;">
+      <div class="badge">Your Final Ranking</div>
+      <div id="submission-summary" style="margin-top:8px;"></div>
+    </div>
+  </div>
+
+  <!-- ───────── SCREEN: FACILITATOR ───────── -->
+  <div id="screen-facilitator" class="screen">
+    <div class="badge">Facilitator Dashboard</div>
+    <h1>Live Submissions 🎛️</h1>
+
+    <div style="display:flex; gap:12px; align-items:center; margin:12px 0 20px; flex-wrap:wrap;">
+      <div><span class="status-dot"></span><span id="sub-count" style="font-size:14px; color:#94a3b8;">0 teams
+          submitted</span></div>
+      <button class="btn btn-ghost btn-sm" onclick="loadSubmissions()">↻ Refresh</button>
+      <button class="btn btn-danger btn-sm" onclick="resetAll()">Reset Game</button>
+    </div>
+
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('submissions')">Team Submissions</button>
+      <button class="tab" onclick="switchTab('debrief')">Debrief Guide</button>
+    </div>
+
+    <div id="tab-submissions">
+      <div id="submissions-grid" class="team-grid">
+        <p style="color:#475569; font-size:14px;">No submissions yet. Refresh to check.</p>
+      </div>
+    </div>
+
+    <div id="tab-debrief" style="display:none;">
+      <div class="card">
+        <div class="badge">Opening Line</div>
+        <p style="color:#f1f5f9; margin-top:8px; line-height:1.8;">"Notice which teams rebuilt fastest. What did they
+          have in common? They didn't default to the tools they already knew — they picked tools based on what the
+          problem actually needed. That's exactly the mindset we need when we talk about stablecoins today."</p>
+      </div>
+      <div class="card">
+        <div class="badge">Key Reveal Points</div>
+        <p style="color:#f1f5f9; margin-top:8px; line-height:1.8;">
+          ⚡ <strong>Teams who picked the Stablecoin Rail early</strong> could settle payments instantly without the
+          broken core system.<br /><br />
+          🔪 <strong>Smart Contracts</strong> automated payroll — no manual processing needed during the
+          crisis.<br /><br />
+          🗺️ <strong>Compliance License</strong> was scarce — teams that missed it couldn't legally operate new
+          tools.<br /><br />
+          🔥 <strong>ACH users</strong> kept waiting 3 days. Ask: "What did your members do during those 3 days?"
+        </p>
+      </div>
+      <div class="card">
+        <div class="badge">Transition to Teaching</div>
+        <p style="color:#f1f5f9; margin-top:8px; line-height:1.8;">"The Stablecoin Payment Rail and Smart Contract
+          Module — those aren't fictional. They exist today. Let's talk about what they actually are and why credit
+          unions should care."</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ─── CONFIGURATION ───────────────────────────────────────────────
+    // REPLACE THIS with your Google Apps Script Web App URL after setup
+    const APPS_SCRIPT_URL = "https://script.google.com/a/macros/lamontblack.com/s/AKfycbzueWmyoNEvGAxIuEWhZ1uDi85meyunCq5duMFF_igRvgGe2kQWv7IK6XaptB-CsJMK1g/exec";
+    const FACILITATOR_PASSWORD = "maple2026";
+    const GAME_DURATION_MINUTES = 25;
+    const MAX_BUDGET = 10;
+    const MAX_TOOLS = 5;
+
+    // ─── TOOLS DATA ──────────────────────────────────────────────────
+    const TOOLS = [
+      { id: "ach", emoji: "🔥", name: "ACH Transfer System", cost: 1, qty: 8, desc: "Moves money — but takes 3 days to settle.", pill: "common", pillLabel: "Common" },
+      { id: "stable", emoji: "⚡", name: "Stablecoin Payment Rail", cost: 3, qty: 3, desc: "Settles in seconds globally, costs cents per transfer.", pill: "rare", pillLabel: "Rare ×3" },
+      { id: "vault", emoji: "🏦", name: "Reserve Cash Vault", cost: 2, qty: 5, desc: "Covers immediate member withdrawals.", pill: "limited", pillLabel: "Limited ×5" },
+      { id: "comply", emoji: "🗺️", name: "Compliance License", cost: 2, qty: 2, desc: "Required to legally operate any new digital tool.", pill: "rare", pillLabel: "Rare ×2" },
+      { id: "smart", emoji: "🔪", name: "Smart Contract Module", cost: 3, qty: 3, desc: "Automates payroll & loan payments without manual work.", pill: "rare", pillLabel: "Rare ×3" },
+      { id: "core", emoji: "🛖", name: "Core Banking Backup", cost: 2, qty: 4, desc: "Keeps member accounts accessible during the crisis.", pill: "limited", pillLabel: "Limited ×4" },
+      { id: "comms", emoji: "🧭", name: "Member Communication Plan", cost: 1, qty: 8, desc: "Prevents member panic and branch walkouts.", pill: "common", pillLabel: "Common" },
+      { id: "fraud", emoji: "💊", name: "Fraud Protection Layer", cost: 2, qty: 4, desc: "Required when using any new digital payment tool.", pill: "limited", pillLabel: "Limited ×4" },
+      { id: "bridge", emoji: "🪢", name: "Interoperability Bridge", cost: 2, qty: 3, desc: "Lets new tools connect to your existing systems.", pill: "rare", pillLabel: "Rare ×3" },
+    ];
+
+    const PILL_COLORS = { common: "pill-green", limited: "pill-yellow", rare: "pill-red" };
+
+    // ─── STATE ───────────────────────────────────────────────────────
+    let state = { role: "", name: "", team: "", selected: [], timerInterval: null, secondsLeft: GAME_DURATION_MINUTES * 60 };
+
+    // ─── NAVIGATION ──────────────────────────────────────────────────
+    function show(id) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById('screen-' + id).classList.add('active');
+      window.scrollTo(0, 0);
+    }
+
+    // ─── ROLE SETUP ──────────────────────────────────────────────────
+    document.getElementById('role-select').addEventListener('change', function () {
+      document.getElementById('participant-fields').style.display = this.value === 'participant' ? 'block' : 'none';
+      document.getElementById('facilitator-fields').style.display = this.value === 'facilitator' ? 'block' : 'none';
+    });
+
+    function handleRoleSubmit() {
+      const role = document.getElementById('role-select').value;
+      if (!role) return alert("Please select your role.");
+
+      if (role === 'facilitator') {
+        const pass = document.getElementById('fac-pass').value;
+        if (pass !== FACILITATOR_PASSWORD) {
+          document.getElementById('fac-error').style.display = 'block';
+          return;
+        }
+        state.role = 'facilitator';
+        show('facilitator');
+        loadSubmissions();
+        return;
+      }
+
+      const name = document.getElementById('p-name').value.trim();
+      const team = document.getElementById('p-team').value.trim();
+      if (!name) return alert("Please enter your name.");
+      if (!team) return alert("Please enter your team name.");
+
+      state.role = 'participant';
+      state.name = name;
+      state.team = team;
+      document.getElementById('team-display').textContent = team + ' — ' + name;
+      show('scenario');
+    }
+
+    // ─── GAME SETUP ──────────────────────────────────────────────────
+    function goToGame() {
+      show('game');
+      renderAvailableTools();
+      startTimer();
+    }
+
+    function startTimer() {
+      state.timerInterval = setInterval(() => {
+        state.secondsLeft--;
+        const m = Math.floor(state.secondsLeft / 60);
+        const s = state.secondsLeft % 60;
+        const el = document.getElementById('timer-display');
+        el.textContent = m + ':' + String(s).padStart(2, '0');
+        el.className = 'timer' + (state.secondsLeft <= 120 ? ' urgent' : '');
+        if (state.secondsLeft <= 0) { clearInterval(state.timerInterval); autoSubmit(); }
+      }, 1000);
+    }
+
+    function autoSubmit() {
+      if (state.selected.length > 0) submitSelections();
+    }
+
+    // ─── TOOL RENDERING ──────────────────────────────────────────────
+    function renderAvailableTools() {
+      const container = document.getElementById('tools-available');
+      const budget = budgetRemaining();
+      container.innerHTML = TOOLS.map(t => {
+        const sel = state.selected.includes(t.id);
+        const canAfford = sel || budget >= t.cost;
+        const canSelect = sel || (state.selected.length < MAX_TOOLS && canAfford);
+        return `
+      <div class="tool-card ${sel ? 'selected' : ''} ${!canSelect ? 'disabled' : ''}"
+           onclick="${canSelect ? `toggleTool('${t.id}')` : ''}"
+           style="${!canSelect ? 'opacity:0.4;cursor:not-allowed;' : ''}">
+        <div class="tool-emoji">${t.emoji}</div>
+        <div class="tool-info">
+          <div class="tool-name">${t.name} <span class="pill ${PILL_COLORS[t.pill]}">${t.pillLabel}</span></div>
+          <div class="tool-desc">${t.desc}</div>
+          <div class="tool-cost">Cost: ${t.cost} pt${t.cost > 1 ? 's' : ''}</div>
+        </div>
+        ${sel ? '<div style="color:#6366f1;font-size:20px;flex-shrink:0;">✓</div>' : ''}
+      </div>`;
+      }).join('');
+    }
+
+    function renderRankedTools() {
+      const container = document.getElementById('tools-ranked');
+      const empty = document.getElementById('ranked-empty');
+      if (state.selected.length === 0) { container.innerHTML = ''; empty.style.display = 'block'; return; }
+      empty.style.display = 'none';
+      container.innerHTML = state.selected.map((id, i) => {
+        const t = TOOLS.find(x => x.id === id);
+        return `
+      <div class="tool-card" draggable="true" data-id="${id}"
+           ondragstart="dragStart(event)" ondragover="dragOver(event)"
+           ondrop="drop(event)" ondragleave="dragLeave(event)">
+        <div class="rank-badge">${i + 1}</div>
+        <div class="tool-emoji">${t.emoji}</div>
+        <div class="tool-info">
+          <div class="tool-name">${t.name}</div>
+          <div class="tool-desc">${t.desc}</div>
+        </div>
+        <div onclick="removeToolAt(${i})" style="color:#ef4444;font-size:18px;cursor:pointer;flex-shrink:0;padding:4px;">✕</div>
+      </div>`;
+      }).join('');
+      document.getElementById('submit-btn').disabled = state.selected.length === 0;
+    }
+
+    // ─── TOOL SELECTION ──────────────────────────────────────────────
+    function toggleTool(id) {
+      const idx = state.selected.indexOf(id);
+      if (idx >= 0) { state.selected.splice(idx, 1); }
+      else if (state.selected.length < MAX_TOOLS) {
+        const t = TOOLS.find(x => x.id === id);
+        if (budgetRemaining() >= t.cost) state.selected.push(id);
+      }
+      document.getElementById('budget-display').textContent = budgetRemaining() + ' pts';
+      renderAvailableTools();
+      renderRankedTools();
+    }
+
+    function removeToolAt(i) { state.selected.splice(i, 1); renderAvailableTools(); renderRankedTools(); }
+
+    function budgetRemaining() {
+      return MAX_BUDGET - state.selected.reduce((sum, id) => {
+        const t = TOOLS.find(x => x.id === id); return sum + (t ? t.cost : 0);
+      }, 0);
+    }
+
+    // ─── DRAG & DROP ─────────────────────────────────────────────────
+    let dragSrc = null;
+    function dragStart(e) { dragSrc = e.currentTarget; e.currentTarget.classList.add('dragging'); }
+    function dragOver(e) { e.preventDefault(); e.currentTarget.classList.add('drag-over'); }
+    function dragLeave(e) { e.currentTarget.classList.remove('drag-over'); }
+    function drop(e) {
+      e.preventDefault();
+      e.currentTarget.classList.remove('drag-over');
+      if (!dragSrc || dragSrc === e.currentTarget) return;
+      const from = state.selected.indexOf(dragSrc.dataset.id);
+      const to = state.selected.indexOf(e.currentTarget.dataset.id);
+      if (from < 0 || to < 0) return;
+      [state.selected[from], state.selected[to]] = [state.selected[to], state.selected[from]];
+      dragSrc.classList.remove('dragging');
+      dragSrc = null;
+      renderRankedTools();
+    }
+
+    // ─── SUBMIT ──────────────────────────────────────────────────────
+    async function submitSelections() {
+      clearInterval(state.timerInterval);
+      const errEl = document.getElementById('submit-error');
+      errEl.style.display = 'none';
+
+      const ranked = state.selected.map((id, i) => {
+        const t = TOOLS.find(x => x.id === id);
+        return `${i + 1}. ${t.emoji} ${t.name}`;
+      }).join(' | ');
+
+      const payload = {
+        name: state.name,
+        team: state.team,
+        ranked,
+        notes: document.getElementById('team-notes').value.trim(),
+        timestamp: new Date().toLocaleString()
+      };
+
+      try {
+        await fetch(APPS_SCRIPT_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+      } catch (e) {
+        errEl.textContent = "Could not reach the server. Check your Apps Script URL.";
+        errEl.style.display = 'block';
+        return;
+      }
+
+      // Summary
+      document.getElementById('submission-summary').innerHTML = state.selected.map((id, i) => {
+        const t = TOOLS.find(x => x.id === id);
+        return `<div class="ranked-tool"><div class="rank-badge" style="width:22px;height:22px;font-size:12px;">${i + 1}</div>
+            <span style="font-size:18px;">${t.emoji}</span>
+            <span style="color:#f1f5f9;font-size:14px;">${t.name}</span></div>`;
+      }).join('');
+
+      show('submitted');
+    }
+
+    // ─── FACILITATOR ─────────────────────────────────────────────────
+    async function loadSubmissions() {
+      try {
+        const res = await fetch(APPS_SCRIPT_URL + '?action=get');
+        const data = await res.json();
+        renderSubmissions(data);
+      } catch (e) {
+        document.getElementById('submissions-grid').innerHTML =
+          '<p style="color:#f87171;">Could not load submissions. Check your Apps Script URL and make sure it is deployed.</p>';
+      }
+    }
+
+    function renderSubmissions(data) {
+      const grid = document.getElementById('submissions-grid');
+      document.getElementById('sub-count').textContent = data.length + ' team' + (data.length !== 1 ? 's' : '') + ' submitted';
+      if (!data.length) { grid.innerHTML = '<p style="color:#475569;font-size:14px;">No submissions yet.</p>'; return; }
+      grid.innerHTML = data.map(s => `
+    <div class="team-submission">
+      <div class="team-name-label">🏷️ ${s.team} <span style="color:#64748b;font-weight:400;font-size:12px;">— ${s.name}</span></div>
+      ${s.ranked.split(' | ').map(r => `<div class="ranked-tool"><span style="color:#f1f5f9;">${r}</span></div>`).join('')}
+      ${s.notes ? `<div style="margin-top:8px;font-size:12px;color:#64748b;font-style:italic;">"${s.notes}"</div>` : ''}
+      <div style="font-size:11px;color:#334155;margin-top:8px;">${s.timestamp}</div>
+    </div>`).join('');
+    }
+
+    function switchTab(tab) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.getElementById('tab-submissions').style.display = tab === 'submissions' ? 'block' : 'none';
+      document.getElementById('tab-debrief').style.display = tab === 'debrief' ? 'block' : 'none';
+      event.target.classList.add('active');
+    }
+
+    async function resetAll() {
+      if (!confirm("Reset ALL submissions? This cannot be undone.")) return;
+      await fetch(APPS_SCRIPT_URL + '?action=reset');
+      loadSubmissions();
+    }
+  </script>
+</body>
+
+</html>
